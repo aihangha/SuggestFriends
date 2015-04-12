@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#eeeeee"
+        android:orientation="vertical"
+        android:showDividers="none" >
+
+        <TextView
+            android:id="@+id/txtFriendNameinMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#eeeedd"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="Name"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <ListView
+            android:id="@+id/lstChat"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:divider="@null"
+            android:dividerHeight="0dp" >
+
+        </ListView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff" >
+
+            <EditText
+                android:id="@+id/txtSendInMessage"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:inputType="textMultiLine"
+                android:isScrollContainer="true"
+                android:maxLines="3" >
+
+                <requestFocus />
+            </EditText>
+
+            <Button
+                android:id="@+id/btnSendInMessage"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:text="Send" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
