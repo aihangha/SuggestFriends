@@ -6,7 +6,7 @@
 	<uses-feature android:name="android.hardware.camera"
                   android:required="true" />
     <uses-sdk
-        android:minSdkVersion="16"
+        android:minSdkVersion="15"
         android:targetSdkVersion="20" />
     <!-- Internet Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -56,7 +56,7 @@
         </activity>
         <activity
             android:name="mekong89.suggestfriend.Login"
-            android:label="Login"
+            android:label="WECOM"
             android:noHistory="true"
             android:screenOrientation="portrait" >
             <intent-filter>

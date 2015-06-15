@@ -24,6 +24,7 @@ public class PostItem{
 	private int numOfLike;
 	private int numOfComment;
 	private Bitmap bitmapAvatar;
+	private Bitmap imgContent = null;
 	private Date postDate;
 	private boolean isLiked= false;
 	private String imagename;
@@ -33,9 +34,9 @@ public class PostItem{
 		this.context = context;
 		this.id = id;
 		this.email = email;
-		this.content = content;
+		this.content = Utils.convertUTF8(content);
 		this.numOfLike = numOfLike;
-		this.bitmapAvatar = Utils.getBitmapFromURL(context,Utils.avatarAddress + Utils.getNameFromEmail(email)+"64.jpg","avatar");
+		this.bitmapAvatar = Utils.getBitmapFromURL(context,Utils.avatarAddress(context) + Utils.getNameFromEmail(email)+"64.jpg","avatar");
 		this.isLiked = isLiked;
 		this.imagename=imagename;
 		this.numOfComment = numOfComment;
@@ -48,6 +49,11 @@ public class PostItem{
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+        
+        if (null != imagename
+				&& !imagename.isEmpty()) {
+        	imgContent = Utils.getBitmapFromURL(context, Utils.postImages(context) + imagename,"post");
 		}
         
 	}
@@ -114,11 +120,7 @@ public class PostItem{
 	}
 	
 	public Bitmap getBitmapInPost(){
-		if(null!=imagename && !imagename.isEmpty()){
-			return Utils.getBitmapFromURL(context, Utils.postImages + imagename,"post");
-		} else{
-			return null;
-		}
+		return imgContent;
 	}
 	
 	public PostItemTransfer getPostItemTransfer(){

@@ -33,12 +33,7 @@ public class CheckOnlineService extends IntentService {
 
 	JSONParser jsonParser = new JSONParser();
 	Location location;
-	private static final String url_create_wifi_entry = Utils.adrr
-			+ "wifi/create_entry.php";
-	private static final String url_create_gps_entry = Utils.adrr
-			+ "gps/create_entry.php";
-	private static final String url_delete_wifi_entry = Utils.adrr
-			+ "wifi/delete_entry.php";
+	
 
 	// @Override
 	protected void onHandleIntent(Intent intent) {
@@ -117,7 +112,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						url_create_wifi_entry, "POST", params);
+						Utils.url_create_wifi_entry(getApplicationContext()), "POST", params);
 				// check your log for json response
 				// Log.d("Mekong89", json.toString());
 				if (json != null) {
@@ -167,7 +162,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						url_delete_wifi_entry, "POST", params);
+						Utils.url_delete_wifi_entry(getApplicationContext()), "POST", params);
 
 				// json success tag
 				if (json != null) {
@@ -227,7 +222,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						url_create_gps_entry, "POST", params);
+						Utils.url_create_gps_entry(getApplicationContext()), "POST", params);
 				// check your log for json response
 				// Log.d("Mekong89", json.toString());
 				if (json != null) {
@@ -274,7 +269,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_wifi_list, "POST", params);
+						Utils.url_get_wifi_list(getApplicationContext()), "POST", params);
 				if (null == json) {
 					Log.d("Mekong89", "Get GPS List Fail! ");
 					return "0";
@@ -298,7 +293,7 @@ public class CheckOnlineService extends IntentService {
 						.valueOf(0.00000898 * Integer.parseInt(value[0]))));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
-				json = jsonParser.makeHttpRequest(Utils.url_get_gps_list,
+				json = jsonParser.makeHttpRequest(Utils.url_get_gps_list(getApplicationContext()),
 						"POST", params);
 				Log.d("Mekong89", json.toString());
 				// json success tag
@@ -455,7 +450,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_check_message, "GET", params);
+						Utils.url_check_message(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -528,7 +523,7 @@ public class CheckOnlineService extends IntentService {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_update_message, "POST", params);
+						Utils.url_update_message(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "-1";
 				}

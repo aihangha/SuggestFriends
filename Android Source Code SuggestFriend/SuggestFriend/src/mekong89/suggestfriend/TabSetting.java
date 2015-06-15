@@ -1,21 +1,10 @@
 package mekong89.suggestfriend;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -36,16 +25,15 @@ public class TabSetting extends Activity {
 	TextView txtFacebook;
 	ImageView imgAvater;
 	Button btnLogOut;
-	
+
+	static boolean firstTabClick = true;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.tab_info);
+		setContentView(R.layout.tab_setting);
 		
 		email = LocalStore.getString(getApplicationContext(), Utils.TAG_EMAIL);
-		txtEmail = (TextView) findViewById(R.id.txtFriendEmail);
-		txtEmail.setText(email);
 		
 		btnLogOut = (Button) findViewById(R.id.btnLogOut);
 		btnLogOut.setOnClickListener(new OnClickListener() {
@@ -58,12 +46,19 @@ public class TabSetting extends Activity {
 				TabSetting.this.finish();
 			}
 		});
+
+
 		
 		// allow internet access strict
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy); 
 		
-		new GetProductDetails().execute();
+		
+	}
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
 	}
 	@Override
 	public void onBackPressed() {
@@ -84,80 +79,12 @@ public class TabSetting extends Activity {
 	        }
 		//super.onBackPressed();
 	}
-	/**
-	 * Background Async Task to Get complete product details
-	 * */
-	class GetProductDetails extends AsyncTask<String, String, String> {
-
-		/**
-		 * Before starting background thread Show Progress Dialog
-		 * */
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-
-		/**
-		 * Getting product details in background thread
-		 * */
-		protected String doInBackground(String... params) {
-
-			// updating UI from Background Thread
-			runOnUiThread(new Runnable() {
-				public void run() {
-					// Check for success tag
-					int success;
-					try {
-						// Building Parameters
-						List<NameValuePair> params = new ArrayList<NameValuePair>();
-						params.add(new BasicNameValuePair(Utils.TAG_EMAIL, "'"+email+"'"));
-						// getting user details by making HTTP request
-						// Note that product details url will use GET request
-						JSONObject json = jsonParser.makeHttpRequest(
-								Utils.url_get_user, "GET", params);
-						// check your log for json response
-						Log.d("Single User Details", json.toString());
-						
-						// json success tag
-						success = json.getInt(Utils.TAG_SUCCESS);
-						if (success == 1) {
-							// successfully received product details
-							JSONArray userObj = json
-									.getJSONArray(Utils.TAG_USER); // JSON Array
-							
-							// get first product object from JSON Array
-							JSONObject user = userObj.getJSONObject(0);
-
-							// product with this pid found
-							// Edit Text
-							txtBirthday = (TextView) findViewById(R.id.txtFriendBirthday);
-							txtCellPhone = (TextView) findViewById(R.id.txtFriendCellPhone);
-							txtFacebook= (TextView) findViewById(R.id.txtFriendFacebook);
-							imgAvater = (ImageView) findViewById(R.id.imgBackgroundInHome);
-
-							// display product data in EditText
-							txtBirthday.setText(user.getString(Utils.TAG_BIRTHDAY));
-							txtCellPhone.setText(user.getString(Utils.TAG_CELLPHONE));
-							txtFacebook.setText(user.getString(Utils.TAG_FACEBOOK));
-							imgAvater.setImageDrawable(Utils.LoadImageFromWebOperations(Utils.avatarAddress + user.getString(Utils.TAG_IMG)));							
-						}else{
-							// user with email not found
-						}
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
-			return null;
-		}
-
-
-		/**
-		 * After completing background task Dismiss the progress dialog
-		 * **/
-		protected void onPostExecute(String file_url) {
-			// dismiss the dialog once got all details
+	public void OnTabClick(){
+		if(firstTabClick){
+			firstTabClick = false;
+		} else{
+			
 		}
 	}
+	
 }

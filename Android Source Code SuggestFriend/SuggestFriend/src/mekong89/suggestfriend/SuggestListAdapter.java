@@ -106,7 +106,7 @@ public class SuggestListAdapter extends BaseAdapter {
 
              holder.name.setText( tempValues.getName() );
              holder.meetCount.setText( "meet " + tempValues.getMeetCount() + "time(s)");
-             holder.image.setImageDrawable(Utils.LoadImageFromWebOperations(Utils.avatarAddress + tempValues.getImageLink()));
+             holder.image.setImageDrawable(Utils.LoadImageFromWebOperations(Utils.avatarAddress(activity) + tempValues.getImageLink()));
               
              /******** Set Item Click Listner for LayoutInflater for each row *******/
              //vi.setOnClickListener(new OnClickListener( position ));

@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity {
 	private Boolean exit = false;
 	TabHost tabHost;
 	LocalActivityManager mlam;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,10 +71,26 @@ public class MainActivity extends ActionBarActivity {
 
 		tabHost.setOnTabChangedListener(new OnTabChangeListener() {
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void onTabChanged(String tabID) {
 				// TODO Auto-generated method stub
-				Log.d("Mekong89", "Switch to " + tabID);
+				if (tabID.equals("Feed")) {
+					TabFeeds tabFeeds = (TabFeeds) mlam.getActivity("Feed");
+					tabFeeds.OnTabClick();
+				}
+				if (tabID.equals("Messages")) {
+					TabMessages tabMessages = (TabMessages) mlam.getActivity("Messages");
+					tabMessages.OnTabClick();
+				}
+				if (tabID.equals("Friends")) {
+					TabFriends tabFriends = (TabFriends) mlam.getActivity("Friends");
+					tabFriends.OnTabClick();					
+				}
+				if (tabID.equals("Setting")) {
+					TabSetting tabSetting = (TabSetting) mlam.getActivity("Setting");
+					tabSetting.onResume();
+				}
 			}
 		});
 
@@ -112,18 +129,18 @@ public class MainActivity extends ActionBarActivity {
 		// });
 		// builder.create().show();
 		// }
-		
+
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == TabFeeds.REQUEST_IMAGE_CAPTURE)
-        {
+		if (requestCode == TabFeeds.REQUEST_IMAGE_CAPTURE
+				|| requestCode == TabFeeds.REQUEST_IMAGE_GALLERY) {
 			TabFeeds tabFeeds = (TabFeeds) mlam.getActivity("Feed");
-            tabFeeds.onActivityResult(requestCode, resultCode, data);
-        }
+			tabFeeds.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 
 	@Override
@@ -203,7 +220,7 @@ public class MainActivity extends ActionBarActivity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_friend, "GET", params);
+						Utils.url_get_friend(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -286,7 +303,7 @@ public class MainActivity extends ActionBarActivity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow_list, "GET", params);
+						Utils.url_get_follow_list(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}

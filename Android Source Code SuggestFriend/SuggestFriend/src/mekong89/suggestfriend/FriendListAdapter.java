@@ -124,7 +124,7 @@ public class FriendListAdapter extends BaseAdapter {
 					tempValues.email.lastIndexOf("@"));
 			holder.name.setText(name);
 			holder.image.setImageBitmap(Utils.getBitmapFromURL(activity,
-					Utils.avatarAddress + name + "64.jpg", "avatar"));
+					Utils.avatarAddress(activity) + name + "64.jpg", "avatar"));
 			holder.image.setTag(tempValues);
 			if (!tempValues.isFriend && activity instanceof TabFriends) {
 				holder.btnAccept.setVisibility(View.VISIBLE);

@@ -71,7 +71,7 @@ public class UserHomeActivity extends Activity {
 		txtUsername.setText(Utils.getNameFromEmail(email));
 		imgAvatar.setImageBitmap(Utils.getBitmapFromURL(
 				getApplicationContext(),
-				Utils.avatarAddress + Utils.getNameFromEmail(email) + "64.jpg",
+				Utils.avatarAddress(getApplicationContext()) + Utils.getNameFromEmail(email) + "64.jpg",
 				"avatar"));
 
 		btnAddFriend = (Button) findViewById(R.id.btnAddFriendInHome);
@@ -255,7 +255,7 @@ public class UserHomeActivity extends Activity {
 						// getting user details by making HTTP request
 						// Note that product details url will use GET request
 						JSONObject json = jsonParser.makeHttpRequest(
-								Utils.url_get_user, "GET", params);
+								Utils.url_get_user(getApplicationContext()), "GET", params);
 						// check your log for json response
 						Log.d("Single User Details", json.toString());
 
@@ -312,7 +312,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_feed_by_user, "GET", params);
+						Utils.url_feed_by_user(getApplicationContext()), "GET", params);
 				feedArray.clear();
 				if (null == json) {
 					return "-1";
@@ -402,7 +402,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_create_like, "POST", params);
+						Utils.url_create_like(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -443,7 +443,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_delete_like, "POST", params);
+						Utils.url_delete_like(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -483,7 +483,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_request_friend, "POST", params);
+						Utils.url_request_friend(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -540,7 +540,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_check_friend_relate, "GET", params);
+						Utils.url_check_friend_relate(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -628,7 +628,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_answer_request, "POST", params);
+						Utils.url_answer_request(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -686,7 +686,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_unfriend, "POST", params);
+						Utils.url_unfriend(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -742,7 +742,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_follow, "POST", params);
+						Utils.url_follow(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -798,7 +798,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_unfollow, "POST", params);
+						Utils.url_unfollow(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -854,7 +854,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow_state, "GET", params);
+						Utils.url_get_follow_state(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "0";
 				}
@@ -911,7 +911,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_friend, "GET", params);
+						Utils.url_get_friend(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -989,7 +989,7 @@ public class UserHomeActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow_list, "GET", params);
+						Utils.url_get_follow_list(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}

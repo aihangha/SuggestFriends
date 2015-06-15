@@ -149,7 +149,7 @@ public class JSONParser {
 			Log.e("JSON Parser", "Error parsing data " + e.toString());
 		}
 
-		// return JSON String
+		// return JSON Stringf
 		return jObj;
 
 	}

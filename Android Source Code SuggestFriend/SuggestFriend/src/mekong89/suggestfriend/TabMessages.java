@@ -28,8 +28,8 @@ public class TabMessages extends Activity {
 	private Boolean exit = false;
 	ListView listFriend;
 	JSONParser jsonParser = new JSONParser();
-	ArrayList<FriendListItem> friendArray = new ArrayList<FriendListItem>();
-	FriendListAdapter friendListAdapater;
+	ArrayList<String> chatArrayList = new ArrayList<String>();
+	ChatListAdapter chatListAdapater;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +55,8 @@ public class TabMessages extends Activity {
 				// TODO Auto-generated method stub
 				Intent messageActivity = new Intent(TabMessages.this,
 						xMessage.class);
-				messageActivity.putExtra("friendMail", friendArray
-						.get(position).email);
+				messageActivity.putExtra("friendMail", chatArrayList
+						.get(position));
 				startActivity(messageActivity);
 
 				// Toast.makeText(Friends.this,
@@ -64,10 +64,14 @@ public class TabMessages extends Activity {
 				// Toast.LENGTH_SHORT).show();
 			}
 		});
-		friendListAdapater = new FriendListAdapter(this, friendArray);
-		listFriend.setAdapter(friendListAdapater);
-		new GetFriendList().execute();
-		new GetFollowList().execute();
+		addItems();
+		chatListAdapater = new ChatListAdapter(this, chatArrayList);
+		listFriend.setAdapter(chatListAdapater);
+
+
+		
+		//new GetFriendList().execute();
+		//new GetFollowList().execute();
 
 		// Friends.this.startService(new
 		// Intent(getApplicationContext(),CheckOnlineService.class));
@@ -168,6 +172,22 @@ public class TabMessages extends Activity {
 		// }
 	}
 
+	private void addItems() {
+		// TODO Auto-generated method stub
+		String lastChatListRaw = LocalStore.getString(getApplicationContext(), Utils.TAG_CHATLIST);
+		if(lastChatListRaw.isEmpty()) return;
+		String[] chatArray = lastChatListRaw.split(";");
+		List<String> chatList = Arrays.asList(chatArray);
+		chatArrayList.clear();
+		chatArrayList.addAll(chatList);
+	}
+
+	public void OnTabClick() {
+		// TODO Auto-generated method stub
+		addItems();		
+		chatListAdapater.notifyDataSetChanged();
+	}
+	
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -210,7 +230,7 @@ public class TabMessages extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_friend, "GET", params);
+						Utils.url_get_friend(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -265,7 +285,7 @@ public class TabMessages extends Activity {
 										friendItem = new FriendListItem(toUser,
 												true);
 									}
-									friendArray.add(friendItem);
+									
 								} 
 
 							} catch (Exception ex) {
@@ -275,7 +295,7 @@ public class TabMessages extends Activity {
 					} else {
 						
 					}
-					friendListAdapater.notifyDataSetChanged();
+				
 				}
 			});
 
@@ -301,7 +321,7 @@ public class TabMessages extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow, "GET", params);
+						Utils.url_get_follow(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}

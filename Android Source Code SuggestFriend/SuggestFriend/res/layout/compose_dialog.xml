@@ -40,12 +40,17 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnSelectImageInPostDialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Pick Image" />
+        <ImageView
+            android:id="@+id/btnCaptureImageInPostDialog"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/from_camera" />
+
+        <ImageView
+            android:id="@+id/btnGalleryInPostDialog"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:src="@drawable/from_gallary" />
 
     </LinearLayout>
 

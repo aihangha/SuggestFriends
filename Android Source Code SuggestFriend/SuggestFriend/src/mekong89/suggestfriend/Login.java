@@ -32,8 +32,11 @@ public class Login extends Activity {
 	String storedEmail;
 	String checkEmail;
 	String checkPass;
-	private static final String url_get_user = Utils.adrr
-			+ "get_user_details.php";
+	EditText txtServer;
+	boolean flagConnectFail = false;
+
+	// private static final String url_get_user = Utils.adrr
+	// + "get_user_details.php";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,14 @@ public class Login extends Activity {
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 				.permitAll().build();
 		StrictMode.setThreadPolicy(policy);
+
+		//txtServer = (EditText) findViewById(R.id.txtServerIPInLogin);
+//		String storedServer = LocalStore.getString(getApplicationContext(),
+//				Utils.TAG_SERVERIP).trim();
+//		if (storedServer.equals("")) {
+//			storedServer = Configs.defaultIP;
+//		}
+//		txtServer.setText(storedServer);
 
 		// Get UI object
 		txtEmail = (EditText) findViewById(R.id.txtFriendEmail);
@@ -61,15 +72,21 @@ public class Login extends Activity {
 			checkEmail = storedEmail;
 			checkPass = storedPass;
 			try {
+//				LocalStore.saveString(getApplicationContext(),
+//						Utils.TAG_SERVERIP, txtServer.getText().toString()
+//								.trim());
 				String result = new GetProductDetails().execute().get();
 				if (result.equals("1")) {
 
 					startActivity(new Intent(getApplicationContext(),
 							MainActivity.class));
 				} else {
-					Toast.makeText(getApplicationContext(),
-							"Email or password are not valid",
-							Toast.LENGTH_SHORT).show();
+					if (!flagConnectFail) {
+						Toast.makeText(getApplicationContext(),
+								"Email or password are not valid",
+								Toast.LENGTH_SHORT).show();
+
+					}
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -87,6 +104,9 @@ public class Login extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
+//				LocalStore.saveString(getApplicationContext(),
+//						Utils.TAG_SERVERIP, txtServer.getText().toString()
+//								.trim());
 				checkEmail = txtEmail.getText().toString();
 				checkPass = txtPass.getText().toString();
 				try {
@@ -96,9 +116,12 @@ public class Login extends Activity {
 						startActivity(new Intent(getApplicationContext(),
 								MainActivity.class));
 					} else {
-						Toast.makeText(getApplicationContext(),
-								"Email and password are not match",
-								Toast.LENGTH_SHORT).show();
+						if (!flagConnectFail) {
+							Toast.makeText(getApplicationContext(),
+									"Email or password are not valid",
+									Toast.LENGTH_SHORT).show();
+
+						}
 					}
 
 				} catch (InterruptedException e) {
@@ -116,6 +139,7 @@ public class Login extends Activity {
 	 * Background Async Task to Get complete product details
 	 * */
 	class GetProductDetails extends AsyncTask<String, String, String> {
+		int success;
 
 		/**
 		 * Getting product details in background thread
@@ -123,16 +147,23 @@ public class Login extends Activity {
 		protected String doInBackground(String... value) {
 
 			// Check for success tag
-			int success;
+
 			try {
 				// Building Parameters
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
-				params.add(new BasicNameValuePair(Utils.TAG_EMAIL, "'"+ checkEmail +"'"));				
+				params.add(new BasicNameValuePair(Utils.TAG_EMAIL, "'"
+						+ checkEmail + "'"));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
-				JSONObject json = jsonParser.makeHttpRequest(url_get_user,
-						"GET", params);
+				String url =  Utils.url_get_user(getApplicationContext()); 
+				JSONObject json = jsonParser.makeHttpRequest(url
+						, "GET",
+						params);
 				// check your log for json response
+				if (null == json) {
+					flagConnectFail = true;
+					return "-1";
+				}
 				Log.d("Mekong89", json.toString());
 
 				// json success tag
@@ -147,8 +178,10 @@ public class Login extends Activity {
 
 					// product with this pid found
 					if (user.getString(Utils.TAG_PASSWORD).equals(checkPass)) {
-						LocalStore.saveString(getApplicationContext(), Utils.TAG_EMAIL, checkEmail);
-						LocalStore.saveString(getApplicationContext(), Utils.TAG_PASSWORD, checkPass);
+						LocalStore.saveString(getApplicationContext(),
+								Utils.TAG_EMAIL, checkEmail);
+						LocalStore.saveString(getApplicationContext(),
+								Utils.TAG_PASSWORD, checkPass);
 						return "1";
 					}
 					// Edit Text
@@ -161,6 +194,16 @@ public class Login extends Activity {
 			}
 
 			return "0";
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			if (flagConnectFail) {
+				Toast.makeText(getApplicationContext(),
+						"Connect To Server Fail", Toast.LENGTH_LONG).show();
+			}
+			super.onPostExecute(result);
 		}
 
 	}

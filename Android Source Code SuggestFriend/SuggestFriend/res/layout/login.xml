@@ -24,7 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
-            android:text="Email:" />
+            android:text="Email:"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/txtFriendEmail"
@@ -51,7 +52,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_weight="2"
-            android:text="Password:" />
+            android:text="Password:"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/txtLoginPass"
@@ -61,6 +63,32 @@
             android:layout_weight="1"
             android:ems="10"
             android:inputType="textPassword" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="2"
+            android:text="Server IP: "
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/txtServerIPInLogin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:ems="10" />
 
     </LinearLayout>
 

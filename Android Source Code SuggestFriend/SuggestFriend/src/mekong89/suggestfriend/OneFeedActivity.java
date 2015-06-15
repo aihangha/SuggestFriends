@@ -1,5 +1,7 @@
 package mekong89.suggestfriend;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,12 +63,12 @@ public class OneFeedActivity extends Activity {
 		listAdapter = new CommentItemAdapter(this,commentArray);
 		lstComment.setAdapter(listAdapter);
 		txtPostTime.setText(Utils.getDateString(currentFeed.postDate));
-		imgOwnerAvatar.setImageBitmap(Utils.getBitmapFromURL(this, Utils.avatarAddress + currentFeed.getImageLink() , "avatar"));
+		imgOwnerAvatar.setImageBitmap(Utils.getBitmapFromURL(this, Utils.avatarAddress(getApplicationContext()) + currentFeed.getImageLink() , "avatar"));
 		txtPostOwner.setText(currentFeed.getName());
 		txtFeedContent.setText(currentFeed.content);
 		if (null!=currentFeed.imagename && !currentFeed.imagename.isEmpty()) {
 			imgFeedImage.setVisibility(View.VISIBLE);
-			imgFeedImage.setImageBitmap(Utils.getBitmapFromURL(this, Utils.postImages + currentFeed.imagename , "post"));
+			imgFeedImage.setImageBitmap(Utils.getBitmapFromURL(this, Utils.postImages(getApplicationContext()) + currentFeed.imagename , "post"));
 		} else {
 			imgFeedImage.setVisibility(View.GONE);
 		}
@@ -134,7 +136,7 @@ public class OneFeedActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_create_like, "POST", params);
+						Utils.url_create_like(getApplicationContext()), "POST", params);
 				if(null==json) 
 				{return "0";}
 				Log.d("Mekong89", json.toString());
@@ -173,7 +175,7 @@ public class OneFeedActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_delete_like, "POST", params);
+						Utils.url_delete_like(getApplicationContext()), "POST", params);
 				if(null==json) 
 					{return "0";}
 				Log.d("Mekong89", json.toString());
@@ -214,7 +216,7 @@ public class OneFeedActivity extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_comment, "GET", params);
+						Utils.url_get_comment(getApplicationContext()), "GET", params);
 
 				if(null==json){
 					return "-1";
@@ -284,14 +286,21 @@ public class OneFeedActivity extends Activity {
 			int success;
 			try {
 				// Building Parameters
+				String content="";
+				try {
+					content = URLEncoder.encode(value[0], "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("feedid",""+currentFeed.id));
-				params.add(new BasicNameValuePair("content", value[0]));
+				params.add(new BasicNameValuePair("content", content));
 				params.add(new BasicNameValuePair("email", LocalStore.getString(getApplicationContext(),Utils.TAG_EMAIL)));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_create_comment, "POST", params);
+						Utils.url_create_comment(getApplicationContext()), "POST", params);
 				if(null==json){
 					return "-1";
 				}

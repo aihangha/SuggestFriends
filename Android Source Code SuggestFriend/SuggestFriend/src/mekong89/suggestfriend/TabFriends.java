@@ -28,6 +28,7 @@ public class TabFriends extends Activity {
 	JSONParser jsonParser = new JSONParser();
 	ArrayList<FriendListItem> friendArray = new ArrayList<FriendListItem>();
 	FriendListAdapter friendListAdapater;
+	static boolean firstTabClick = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +64,20 @@ public class TabFriends extends Activity {
 
 		friendListAdapater = new FriendListAdapter(this, friendArray);
 		listFriend.setAdapter(friendListAdapater);
-
 		new GetFriendList().execute();
 		new GetFollowList().execute();
+		
 	}
 
+	public void OnTabClick(){
+		if(firstTabClick){
+			firstTabClick = false;
+		} else{
+			new GetFriendList().execute();
+			new GetFollowList().execute();
+		}
+	}
+	
 	public void AcceptFriendRequest(String email) {
 		new AcceptRequestFriend().execute(email);
 	}
@@ -95,7 +105,7 @@ public class TabFriends extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_friend, "GET", params);
+						Utils.url_get_friend(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -129,6 +139,7 @@ public class TabFriends extends Activity {
 			runOnUiThread(new Runnable() {
 				public void run() {
 					if (null!=jsonFriendArray) {
+						friendArray.clear();
 						for (int i = 0; i < jsonFriendArray.length(); i++) {
 							try {
 								JSONObject result = (JSONObject) jsonFriendArray
@@ -187,7 +198,6 @@ public class TabFriends extends Activity {
 					friendListAdapater.notifyDataSetChanged();
 				}
 			});
-
 			super.onPostExecute(result);
 		}
 	}
@@ -211,7 +221,7 @@ public class TabFriends extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow, "GET", params);
+						Utils.url_get_follow(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -227,10 +237,10 @@ public class TabFriends extends Activity {
 							"Get Follow List Success! "
 									+ json.getString(Utils.TAG_MESSAGE));
 					followListRaw = json.getString("follow");
-					if (!followListRaw.equals("")) {
-						LocalStore.saveString(getApplicationContext(),
+					//if (!followListRaw.equals("")) {
+					LocalStore.saveString(getApplicationContext(),
 								Utils.TAG_FOLLOWLIST, followListRaw);
-					}
+					//}
 
 				} else {
 					Log.d("Mekong89",
@@ -263,7 +273,7 @@ public class TabFriends extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_answer_request, "POST", params);
+						Utils.url_answer_request(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}

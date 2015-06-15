@@ -1,8 +1,11 @@
 package mekong89.suggestfriend;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -29,6 +32,7 @@ public class xMessage extends Activity {
 	ListView lstMessage;
 	TextView txtFriendName;
 	EditText txtSend;
+
 	Button btnSend;
 	String friendMail;
 	MessageListAdapter messageAdapter;
@@ -47,6 +51,7 @@ public class xMessage extends Activity {
 		
 		
 		
+			
 		
 
 		txtFriendName = (TextView) findViewById(R.id.txtFriendNameinMessage);
@@ -54,7 +59,7 @@ public class xMessage extends Activity {
 		txtSend = (EditText) findViewById(R.id.txtSendInMessage);
 		btnSend = (Button) findViewById(R.id.btnSendInMessage);
 		lstMessage = (ListView) findViewById(R.id.lstChat);
-		messageAdapter = new MessageListAdapter(this, arrayMessage,Utils.getBitmapFromURL(this, Utils.avatarAddress + Utils.getNameFromEmail(friendMail) + "64.jpg", "avatar"));
+		messageAdapter = new MessageListAdapter(this, arrayMessage,Utils.getBitmapFromURL(this, Utils.avatarAddress(getApplicationContext()) + Utils.getNameFromEmail(friendMail) + "64.jpg", "avatar"));
 		lstMessage.setAdapter(messageAdapter);
 
 		btnSend.setOnClickListener(new OnClickListener() {
@@ -67,6 +72,25 @@ public class xMessage extends Activity {
 			}
 		});
 		mHandler = new Handler();
+		
+		
+		// bring friend to top of chat list
+		String lastChatListRaw = LocalStore.getString(getApplicationContext(), Utils.TAG_CHATLIST);
+		String[] chatArray = lastChatListRaw.split(";");
+		List<String> chatList = new LinkedList<String>(Arrays.asList(chatArray));
+		
+		int findIndex=chatList.indexOf(friendMail);		
+		if(findIndex>-1){		//available chat
+				chatList.remove(findIndex);
+			lastChatListRaw="";
+			for(int i=0;i<chatList.size();i++){
+				lastChatListRaw+=chatList.get(i)+";";
+			}
+			if(lastChatListRaw.endsWith(";")){
+				lastChatListRaw = lastChatListRaw.substring(0,lastChatListRaw.length()-1);
+			}
+		} 
+		LocalStore.saveString(getApplicationContext(), Utils.TAG_CHATLIST, friendMail+";"+lastChatListRaw);				
 	}
 
 	protected void onResume() {
@@ -123,7 +147,7 @@ public class xMessage extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_message, "GET", params);
+						Utils.url_get_message(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -160,8 +184,8 @@ public class xMessage extends Activity {
 								JSONObject jsonMessage = (JSONObject) jsonMessageList
 										.get(i);
 								String id = jsonMessage.getString("id");
-								String content = jsonMessage
-										.getString("content");
+								String content = Utils.convertUTF8(jsonMessage
+										.getString("content"));
 								String sender = jsonMessage.getString("sender");
 								String imageLink = sender.substring(0,
 										sender.lastIndexOf("@"))
@@ -242,7 +266,7 @@ public class xMessage extends Activity {
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_update_message, "POST", params);
+						Utils.url_update_message(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "-1";
 				}
@@ -261,6 +285,7 @@ public class xMessage extends Activity {
 							"Post Message Fail"
 									+ json.getString(Utils.TAG_MESSAGE));
 				}
+				
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -281,15 +306,22 @@ public class xMessage extends Activity {
 			int success;
 			try {
 				// Building Parameters
+				String content="";
+				try {
+					content = URLEncoder.encode(value[0], "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("sender",LocalStore.getString(getApplicationContext(),
 								Utils.TAG_EMAIL) ));
 				params.add(new BasicNameValuePair("receiver", friendMail));
-				params.add(new BasicNameValuePair("content",value[0]));
+				params.add(new BasicNameValuePair("content",content));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_post_message, "POST", params);
+						Utils.url_post_message(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "-1";
 				}

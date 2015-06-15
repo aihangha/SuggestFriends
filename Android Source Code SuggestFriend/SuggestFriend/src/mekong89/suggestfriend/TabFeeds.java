@@ -2,9 +2,18 @@ package mekong89.suggestfriend;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import mekong89.suggestfriend.TabFriends.GetFollowList;
+import mekong89.suggestfriend.TabFriends.GetFriendList;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -25,6 +34,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
@@ -45,6 +55,7 @@ import android.widget.Toast;
 public class TabFeeds extends Activity implements
 		SwipeRefreshLayout.OnRefreshListener {
 	static final int REQUEST_IMAGE_CAPTURE = 1;
+	static final int REQUEST_IMAGE_GALLERY = 2;
 	String lastupdate = "last30";
 	private Boolean exit = false;
 	Button btnPost;
@@ -58,15 +69,17 @@ public class TabFeeds extends Activity implements
 	ImageView imgPostImageThumb;
 	File capturedImage;
 	String picturePath;
+	static boolean firstTabClick = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tab_feed);
-		
-		capturedImage = new File(Utils.getDataFolder(getApplicationContext())+"/captured.jpg");
-		
+
+		capturedImage = new File(Utils.getDataFolder(getApplicationContext())
+				+ "/captured.jpg");
+
 		feedArray = new ArrayList<PostItem>();
 		listFeed = (ListView) findViewById(R.id.listfeed);
 		getFeedFromServer();
@@ -105,15 +118,25 @@ public class TabFeeds extends Activity implements
 		});
 		imgPostImageThumb = (ImageView) postDialog
 				.findViewById(R.id.imgPostImageThumbInPostDialog);
-		Button dialogPickImage = (Button) postDialog
-				.findViewById(R.id.btnSelectImageInPostDialog);
-		dialogPickImage.setOnClickListener(new OnClickListener() {
+		ImageView btnCaptureImage = (ImageView) postDialog
+				.findViewById(R.id.btnCaptureImageInPostDialog);
+		btnCaptureImage.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				Intent takePictureIntent = new Intent(
-						MediaStore.ACTION_IMAGE_CAPTURE);			
+						MediaStore.ACTION_IMAGE_CAPTURE);
+				File photoFile = null;
+				try {
+					photoFile = createImageFile();
+				} catch (IOException ex) {
+					// Error occurred while creating the File
+
+				}
+
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+						Uri.fromFile(photoFile));
 				if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 					ActionBarActivity parentActivity = (ActionBarActivity) getParent();
 					parentActivity.startActivityForResult(takePictureIntent,
@@ -122,23 +145,45 @@ public class TabFeeds extends Activity implements
 			}
 		});
 
-		txtContent = (EditText) postDialog.findViewById(R.id.txtContentInDialog);
-		Button btnDialogPost = (Button) postDialog
-				.findViewById(R.id.btnPostInDialogPost);
-		btnDialogPost.setOnClickListener(new OnClickListener() {
+		ImageView btnGalleryImage = (ImageView) postDialog
+				.findViewById(R.id.btnGalleryInPostDialog);
+		btnGalleryImage.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if(imgPostImageThumb.getVisibility()==View.GONE){
-					if(txtContent.getText().toString().equals("")){
-						Toast.makeText(getApplicationContext(), "No Post content", Toast.LENGTH_SHORT).show();
-					} else{
+				Intent takePictureIntent = new Intent(
+						Intent.ACTION_PICK,
+						android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+				if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+					ActionBarActivity parentActivity = (ActionBarActivity) getParent();
+					parentActivity.startActivityForResult(takePictureIntent,
+							REQUEST_IMAGE_GALLERY);
+				}
+			}
+		});
+
+		txtContent = (EditText) postDialog
+				.findViewById(R.id.txtContentInDialog);
+		Button btnPost = (Button) postDialog
+				.findViewById(R.id.btnPostInDialogPost);
+		btnPost.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (imgPostImageThumb.getVisibility() == View.GONE) {
+					if (txtContent.getText().toString().equals("")) {
+						Toast.makeText(getApplicationContext(),
+								"No Post content", Toast.LENGTH_SHORT).show();
+					} else {
 						postStatusNoImage(txtContent.getText().toString(), "0");
+						txtContent.setText("");
 						postDialog.dismiss();
 					}
-				} else{
+				} else {
 					postStatusWithImage(txtContent.getText().toString(), "0");
+					txtContent.setText("");
 					postDialog.dismiss();
 				}
 			}
@@ -177,40 +222,82 @@ public class TabFeeds extends Activity implements
 
 	}
 
-	public void postStatusNoImage(String content, String whocansee){
-		new PostStatus().execute(content,whocansee);
+	public void OnTabClick(){
+		if(firstTabClick){
+			firstTabClick = false;
+		} else{
+			getFeedFromServer();
+		}
 	}
-	public void postStatusWithImage(String content, String whocansee){
-		new PostStatusWithImage().execute(content,whocansee);
+	
+	private File createImageFile() throws IOException {
+		// Create an image file name
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+				.format(new Date());
+		String imageFileName = "JPEG_" + timeStamp + "_";
+		File storageDir = Environment
+				.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		File image = File.createTempFile(imageFileName, /* prefix */
+				".jpg", /* suffix */
+				storageDir /* directory */
+		);
+
+		// Save a file: path for use with ACTION_VIEW intents
+		picturePath = image.getAbsolutePath();
+		return image;
 	}
+
+	public void postStatusNoImage(String content, String whocansee) {
+		new PostStatus().execute(content, whocansee);
+	}
+
+	public void postStatusWithImage(String content, String whocansee) {
+		new PostStatusWithImage().execute(content, whocansee);
+	}
+
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-			Bundle extras = data.getExtras();
-			Bitmap imageBitmap = (Bitmap) extras.get("data");
-			imgPostImageThumb.setImageBitmap(imageBitmap);
+			// Bundle extras = data.getExtras();
+			// Bitmap imageBitmap = (Bitmap) extras.get("data");
+			// imgPostImageThumb.setImageBitmap(imageBitmap);
+			// imgPostImageThumb.setVisibility(View.VISIBLE);
+
+			imgPostImageThumb.setImageBitmap(Utils.decodeFile(new File(
+					picturePath), 72));
 			imgPostImageThumb.setVisibility(View.VISIBLE);
 
-			Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
-
-	        // CALL THIS METHOD TO GET THE ACTUAL PATH
-	        picturePath = getRealPathFromURI(tempUri);
-
+		} else if (requestCode == REQUEST_IMAGE_GALLERY
+				&& resultCode == RESULT_OK && null != data) {
+			Uri selectedImage = data.getData();
+			String[] filePathColumn = { MediaStore.Images.Media.DATA };
+			Cursor cursor = getContentResolver().query(selectedImage,
+					filePathColumn, null, null, null);
+			cursor.moveToFirst();
+			int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+			picturePath = cursor.getString(columnIndex);
+			cursor.close();
+			imgPostImageThumb.setImageBitmap(Utils.decodeFile(new File(
+					picturePath), 72));
+			imgPostImageThumb.setVisibility(View.VISIBLE);
 		}
 	}
+
 	public Uri getImageUri(Context inContext, Bitmap inImage) {
-	    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-	    inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-	    String path = Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-	    return Uri.parse(path);
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+		String path = Images.Media.insertImage(inContext.getContentResolver(),
+				inImage, "Title", null);
+		return Uri.parse(path);
 	}
 
 	public String getRealPathFromURI(Uri uri) {
-	    Cursor cursor = getContentResolver().query(uri, null, null, null, null); 
-	    cursor.moveToFirst(); 
-	    int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA); 
-	    return cursor.getString(idx); 
+		Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+		cursor.moveToFirst();
+		int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+		return cursor.getString(idx);
 	}
 
 	public void Follow(String email) {
@@ -284,7 +371,7 @@ public class TabFeeds extends Activity implements
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_list_by_nick, "GET", params);
+						Utils.url_get_list_by_nick(getApplicationContext()), "GET", params);
 
 				Log.d("Mekong89", json.toString());
 				// json success tag
@@ -372,12 +459,20 @@ public class TabFeeds extends Activity implements
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("semail", LocalStore
 						.getString(getApplicationContext(), Utils.TAG_EMAIL)));
-				params.add(new BasicNameValuePair("scontent", value[0]));
+
+				String content = "";
+				try {
+					content = URLEncoder.encode(value[0], "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				params.add(new BasicNameValuePair("scontent", content));
 				params.add(new BasicNameValuePair("swhocansee", value[1]));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_post_status, "POST", params);
+						Utils.url_post_status(getApplicationContext()), "POST", params);
 
 				Log.d("Mekong89", json.toString());
 				// json success tag
@@ -406,17 +501,40 @@ public class TabFeeds extends Activity implements
 			int success;
 			try {
 				// Building Parameters
-				MultipartEntity entity= new MultipartEntity();
-				entity.addPart("semail", new StringBody(LocalStore
-						.getString(getApplicationContext(), Utils.TAG_EMAIL)));
-				entity.addPart("scontent", new StringBody(value[0]));
-				entity.addPart("swhocansee", new StringBody(value[1]));
+				String content = "";
+				try {
+					content = URLEncoder.encode(value[0], "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				Bitmap bitmap = Utils.decodeFile(new File(picturePath), 400);
+				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bytes);
 				File image = new File(picturePath);
-				entity.addPart("file", new FileBody(image));
+				FileOutputStream fo;
+				try {					
+					fo = new FileOutputStream(image,false);
+					fo.write(bytes.toByteArray());
+					fo.close();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}								
+
+				MultipartEntity entity = new MultipartEntity();
+				entity.addPart(
+						"semail",
+						new StringBody(LocalStore.getString(
+								getApplicationContext(), Utils.TAG_EMAIL)));
+				entity.addPart("scontent", new StringBody(content));
+				entity.addPart("swhocansee", new StringBody(value[1]));
+
+				entity.addPart("file", new FileBody(new File(picturePath)));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_post_status_have_image, "POST", entity);
+						Utils.url_post_status_have_image(getApplicationContext()), "POST", entity);
 
 				Log.d("Mekong89", json.toString());
 				// json success tag
@@ -438,7 +556,6 @@ public class TabFeeds extends Activity implements
 		}
 	}
 
-	
 	/**
 	 * Background Async Task to Get complete product details
 	 * */
@@ -459,7 +576,7 @@ public class TabFeeds extends Activity implements
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_create_like, "POST", params);
+						Utils.url_create_like(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -500,7 +617,7 @@ public class TabFeeds extends Activity implements
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_delete_like, "POST", params);
+						Utils.url_delete_like(getApplicationContext()), "POST", params);
 				if (null == json) {
 					return "0";
 				}
@@ -539,7 +656,7 @@ public class TabFeeds extends Activity implements
 				params.add(new BasicNameValuePair("user2", value[0]));
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
-				JSONObject json = jsonParser.makeHttpRequest(Utils.url_follow,
+				JSONObject json = jsonParser.makeHttpRequest(Utils.url_follow(getApplicationContext()),
 						"POST", params);
 				if (null == json) {
 					return "0";
@@ -595,7 +712,7 @@ public class TabFeeds extends Activity implements
 				// getting user details by making HTTP request
 				// Note that product details url will use GET request
 				JSONObject json = jsonParser.makeHttpRequest(
-						Utils.url_get_follow_list, "GET", params);
+						Utils.url_get_follow_list(getApplicationContext()), "GET", params);
 				if (null == json) {
 					return "-1";
 				}

@@ -6,8 +6,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,67 +31,48 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 
 public class Utils {
-	public static final String adrr = "http://friendhub.byethost13.com/wecom/alpha/";
-	public static final String avatarAddress = adrr+"avatar/";
-	public static final String postImages = Utils.adrr + "images/";
-	public static final String url_get_wifi_list = Utils.adrr
-			+ "wifi/get_list.php";
-	public static final String url_get_gps_list = Utils.adrr
-			+ "gps/get_list.php";
-	public static final String url_get_user = Utils.adrr
-			+ "get_user_details.php";
-	public static final String url_post_status = Utils.adrr
-			+ "feed/create_feed.php";
-	public static final String url_post_status_have_image = Utils.adrr
-			+ "feed/create_feed_with_image.php";
-	public static final String url_delete_status = Utils.adrr
-			+ "feed/delete_feed.php";
-	public static final String url_increase_like = Utils.adrr
-			+ "feed/increase_like.php";
-	public static final String url_descrease_like = Utils.adrr
-			+ "feed/descrease_like.php";
-	public static final String url_delete_like = Utils.adrr
-			+ "like/delete_like.php";
-	public static final String url_create_like = Utils.adrr
-			+ "like/create_like.php";
-	public static final String url_get_list_by_nick = Utils.adrr
-			+ "feed/get_list_by_nick.php";
-	public static final String url_get_friend = Utils.adrr + "get_friend.php";
-	public static final String url_get_follow = Utils.adrr + "get_follow.php";
-	public static final String url_get_message = Utils.adrr
-			+ "message/get_message.php";
-	public static final String url_post_message = Utils.adrr
-			+ "message/create_message.php";
-	public static final String url_update_message = Utils.adrr
-			+ "message/update_message.php";
-	public static final String url_check_message = Utils.adrr
-			+ "message/check_message.php";
-	
-	public static final String url_create_comment = Utils.adrr
-			+ "comment/create_comment.php";
-	public static final String url_get_comment = Utils.adrr
-			+ "comment/get_comment.php";
-	public static final String url_feed_by_user = Utils.adrr
-			+ "feed/get_feed_by_user.php";
-	
-	public static final String url_request_friend = Utils.adrr
-			+ "friend/friend_request.php";
-	public static final String url_answer_request = Utils.adrr
-			+ "friend/answer_request.php";
-	public static final String url_check_friend_relate = Utils.adrr
-			+ "friend/check_friend_relate.php";
-	public static final String url_unfriend = Utils.adrr
-			+ "friend/unfriend.php";
-	
-	public static final String url_unfollow = Utils.adrr
-			+ "follow/unfollow.php";
-	public static final String url_follow = Utils.adrr
-			+ "follow/follow.php";
-	public static final String url_get_follow_list = Utils.adrr
-			+ "follow/get_follow_list.php";
-	public static final String url_get_follow_state = Utils.adrr
-			+ "follow/check_follow_state.php";
-	
+	public static String adrr(Context ctx) {
+		//String currentIP = LocalStore.getString(ctx, Utils.TAG_SERVERIP);
+		//if(currentIP.trim().equals("")){
+		//	return "http://" + Configs.defaultIP + "//wecom/alpha/";
+		//}
+		//return "http://"+currentIP+"//wecom/alpha/";
+		return "http://wecom.byethost5.com/alpha/";
+	}
+
+	public static String avatarAddress(Context ctx){ return adrr(ctx)+"avatar/";}
+	public static String postImages(Context ctx){ return adrr(ctx)+"images/";}
+	public static String url_get_wifi_list(Context ctx){ return adrr(ctx)+"wifi/get_list.php";}	
+	public static String url_get_gps_list(Context ctx){ return adrr(ctx)+"gps/get_list.php";}
+	public static String url_get_user(Context ctx){ return adrr(ctx)+"user/get_user_details.php";}
+	public static String url_post_status(Context ctx){ return adrr(ctx)+"feed/create_feed.php";}
+	public static String url_post_status_have_image(Context ctx){ return adrr(ctx)+"feed/create_feed_with_image.php";}
+	public static String url_delete_status(Context ctx){ return adrr(ctx)+"feed/delete_feed.php";}
+	public static String url_increase_like(Context ctx){ return adrr(ctx)+"feed/increase_like.php";}
+	public static String url_descrease_like(Context ctx){ return adrr(ctx)+"feed/descrease_like.php";}
+	public static String url_delete_like(Context ctx){ return adrr(ctx)+"like/delete_like.php";}
+	public static String url_create_like(Context ctx){ return adrr(ctx)+"like/create_like.php";}
+	public static String url_get_list_by_nick(Context ctx){ return adrr(ctx)+"feed/get_list_by_nick.php";}
+	public static String url_get_friend(Context ctx){ return adrr(ctx)+"user/get_friend.php";}
+	public static String url_get_follow(Context ctx){ return adrr(ctx)+"user/get_follow.php";}
+	public static String url_get_message(Context ctx){ return adrr(ctx)+"message/get_message.php";}
+	public static String url_post_message(Context ctx){ return adrr(ctx)+"message/create_message.php";}
+	public static String url_update_message(Context ctx){ return adrr(ctx)+"message/update_message.php";}
+	public static String url_check_message(Context ctx){ return adrr(ctx)+"message/check_message.php";}
+	public static String url_create_comment(Context ctx){ return adrr(ctx)+"comment/create_comment.php";}
+	public static String url_get_comment(Context ctx){ return adrr(ctx)+"comment/get_comment.php";}
+	public static String url_feed_by_user(Context ctx){ return adrr(ctx)+"feed/get_feed_by_user.php";}
+	public static String url_request_friend(Context ctx){ return adrr(ctx)+"friend/friend_request.php";}
+	public static String url_answer_request(Context ctx){ return adrr(ctx)+"friend/answer_request.php";}
+	public static String url_check_friend_relate(Context ctx){ return adrr(ctx)+"friend/check_friend_relate.php";}
+	public static String url_unfriend(Context ctx){ return adrr(ctx)+"friend/unfriend.php";}
+	public static String url_unfollow(Context ctx){ return adrr(ctx)+"follow/unfollow.php";}
+	public static String url_follow(Context ctx){ return adrr(ctx)+"follow/follow.php";}
+	public static String url_get_follow_list(Context ctx){ return adrr(ctx)+"follow/get_follow_list.php";}
+	public static String url_get_follow_state(Context ctx){ return adrr(ctx)+"follow/check_follow_state.php";}
+	public static String url_create_wifi_entry(Context ctx){ return adrr(ctx)+"wifi/create_entry.php";}
+	public static String url_create_gps_entry(Context ctx){ return adrr(ctx)+"gps/create_entry.php";}
+	public static String url_delete_wifi_entry(Context ctx){ return adrr(ctx)+"wifi/delete_entry.php";}
 
 	// JSON Node names
 	public static final String TAG_SUCCESS = "success";
@@ -103,6 +86,8 @@ public class Utils {
 	public static final String TAG_USER = "user";
 	public static final String TAG_FRIENDLIST = "friendlist";
 	public static final String TAG_FOLLOWLIST = "followlist";
+	public static final String TAG_CHATLIST = "chatlist";
+	public static final String TAG_SERVERIP = "serverip";
 
 	public static String getPhoneNumber(Context context) {
 		TelephonyManager tMgr = (TelephonyManager) context
@@ -186,12 +171,13 @@ public class Utils {
 		File imageFile = new File(folder, filename);
 		if (!imageFile.exists()) {
 			try {
-				//imageFile.createNewFile();
+				// imageFile.createNewFile();
 				URL wallpaperURL = new URL(src);
 				URLConnection connection = wallpaperURL.openConnection();
 				InputStream inputStream = new BufferedInputStream(
 						wallpaperURL.openStream(), 10240);
-				FileOutputStream outputStream = new FileOutputStream(imageFile,false);
+				FileOutputStream outputStream = new FileOutputStream(imageFile,
+						false);
 
 				byte buffer[] = new byte[1024];
 				int dataSize;
@@ -314,6 +300,40 @@ public class Utils {
 		}
 	}
 
-	
-	
+	public static String convertUTF8(String s) {
+		try {
+			final String result = URLDecoder.decode(s, "UTF-8"); // new
+																	// String(s.getBytes(),
+																	// "UTF-8");
+			return result;
+		} catch (UnsupportedEncodingException e) {
+			return "";
+		}
+	}
+
+	public static Bitmap decodeFile(File f, int requiredSize) {
+		try {
+			// Decode image size
+			BitmapFactory.Options o = new BitmapFactory.Options();
+			o.inJustDecodeBounds = true;
+			BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+			//
+			// //The new size we want to scale to
+			// final int REQUIRED_SIZE=70;
+
+			// Find the correct scale value. It should be the power of 2.
+			int scale = 1;
+			while (o.outWidth / scale / 2 >= requiredSize
+					&& o.outHeight / scale / 2 >= requiredSize)
+				scale *= 2;
+
+			// Decode with inSampleSize
+			BitmapFactory.Options o2 = new BitmapFactory.Options();
+			o2.inSampleSize = scale;
+			return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+		} catch (FileNotFoundException e) {
+		}
+		return null;
+	}
+
 }
